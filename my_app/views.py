@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 # Create your views here.
 class MenuListView(ListView):
     model = Menu
-    template_name = 'home/home.html'  # tu plantilla
+    template_name = 'home/home.html'
     context_object_name = 'menus'
 
     def get_context_data(self, **kwargs):
