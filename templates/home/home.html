@@ -237,7 +237,11 @@
                 <div></div>
                 <div class="user-info">
                     <div class="user-avatar">👨‍⚕️</div>
-                    {{ request.user.username }}
+                    {% if request.user.is_authenticated %}
+                        {{ request.user.username }}
+                    {% else %}
+                        Invitado
+                    {% endif %}
                 </div>
             </div>
 
