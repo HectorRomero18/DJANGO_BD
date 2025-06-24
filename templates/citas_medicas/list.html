@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Citas Médicas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Reset básico */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            color: #2c3e50;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-card {
+            background: #ffffffee;
+            border-radius: 20px;
+            padding: 40px 50px;
+            box-shadow: 0 15px 40px rgba(44,62,80,0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            margin-bottom: 30px;
+        }
+        
+        .header-card i.bi-calendar-heart {
+            font-size: 50px;
+            color: #3498db;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        
+        .header-card h1 {
+            text-align: center;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px 18px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: 3px solid #bdc3c7;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            color: #2c3e50;
+            min-height: 50px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 12px rgba(52,152,219,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-create {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(39,174,96,0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        
+        .btn-create:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(39,174,96,0.5);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .citas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .cita-card {
+            background: #ffffffee;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(44,62,80,0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            border-left: 5px solid #3498db;
+        }
+        
+        .cita-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(44,62,80,0.18);
+        }
+        
+        .cita-card.pendiente {
+            border-left-color: #f39c12;
+        }
+        
+        .cita-card.atendida {
+            border-left-color: #27ae60;
+        }
+        
+        .cita-card.cancelada {
+            border-left-color: #e74c3c;
+        }
+        
+        .cita-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .cita-fecha {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .cita-estado {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .estado-pendiente {
+            background: #ffeaa7;
+            color: #d68910;
+        }
+        
+        .estado-atendida {
+            background: #a8e6cf;
+            color: #229954;
+        }
+        
+        .estado-cancelada {
+            background: #ffcccb;
+            color: #c0392b;
+        }
+        
+        .cita-info {
+            margin-bottom: 12px;
+        }
+        
+        .cita-info strong {
+            color: #34495e;
+            font-weight: 700;
+        }
+        
+        .cita-info span {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .cita-tarifa {
+            text-align: right;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #27ae60;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #ecf0f1;
+        }
+        
+        .no-citas {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            background: #ffffffee;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(44,62,80,0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .no-citas i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #bdc3c7;
+        }
+        
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .back-link:hover {
+            color: #2980b9;
+            background: rgba(52,152,219,0.1);
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-card {
+                padding: 30px 20px;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-create {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .citas-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .cita-card {
+                padding: 20px;
+            }
+            
+            .cita-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-card">
+            <i class="bi bi-calendar-heart"></i>
+            <h1>Citas Médicas</h1>
+            
+            <form method="get" class="search-bar">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ request.GET.q }}" 
+                    placeholder="Buscar por paciente, médico o empleado..." 
+                    class="search-input"
+                >
+                <a href="{{ create_url }}" class="btn-create">
+                    <i class="bi bi-calendar-plus"></i>
+                    Nueva Cita
+                </a>
+            </form>
+        </div>
+        
+        {% if citas_medicas %}
+            <div class="citas-grid">
+                {% for cita in citas_medicas %}
+                    <div class="cita-card {{ cita.estado }}">
+                        <div class="cita-header">
+                            <div class="cita-fecha">
+                                <i class="bi bi-calendar-event"></i>
+                                {{ cita.fecha|date:"d/m/Y" }} - {{ cita.hora|time:"H:i" }}
+                            </div>
+                            <span class="cita-estado estado-{{ cita.estado }}">
+                                {{ cita.get_estado_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="cita-info">
+                            <strong><i class="bi bi-person-heart"></i> Paciente:</strong>
+                            <span>{{ cita.paciente.nombre }} {{ cita.paciente.apellido }}</span>
+                        </div>
+                        
+                        <div class="cita-info">
+                            <strong><i class="bi bi-person-badge"></i> Médico:</strong>
+                            <span>{{ cita.medico.nombre }} {{ cita.medico.apellido }}</span>
+                        </div>
+                        
+                        <div class="cita-info">
+                            <strong><i class="bi bi-hospital"></i> Especialidad:</strong>
+                            <span>{{ cita.medico.especialidad }}</span>
+                        </div>
+                        
+                        <div class="cita-info">
+                            <strong><i class="bi bi-person-workspace"></i> Empleado:</strong>
+                            <span>{{ cita.empleado.nombre }} {{ cita.empleado.apellido }}</span>
+                        </div>
+                        
+                        <div class="cita-info">
+                            <strong><i class="bi bi-door-open"></i> Consultorio:</strong>
+                            <span>{{ cita.consultorio.numero }}</span>
+                        </div>
+                        
+                        <div class="cita-tarifa">
+                            <i class="bi bi-currency-dollar"></i>
+                            
+                            ${{ cita.tarifa|floatformat:2 }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-citas">
+                <i class="bi bi-calendar-x"></i>
+                <p>No se encontraron citas médicas</p>
+                {% if request.GET.q %}
+                    <p>Intenta con otro término de búsqueda</p>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <a href="/" class="back-link">
+            <i class="bi bi-arrow-left"></i> Volver al menú
+        </a>
+    </div>
+
+    <script>
+        // Auto-submit search on input change
+        const searchInput = document.querySelector('.search-input');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
