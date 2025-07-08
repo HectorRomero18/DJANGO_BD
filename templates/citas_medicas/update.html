@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Crear Empleado</title>
+    <title>Editar Cita Médica</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         /* Reset básico */
@@ -30,7 +30,7 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
-        .center-card i.bi-person-plus {
+        .center-card i.bi-pencil-square {
             font-size: 50px;
             color: #3498db;
             display: block;
@@ -211,81 +211,97 @@
 </head>
 <body>
     <div class="center-card">
-        <i class="bi bi-person-plus"></i>
-        <h2>Registrar Empleado</h2>
+        <i class="bi bi-pencil-square"></i>
+        <h2>Editar Cita Médica</h2>
         <form method="post">
             {% csrf_token %}
             
-            <!-- Usar con Django - Campos organizados según el modelo Empleado -->
+            <!-- Información de Participantes -->
             <div class="form-section">
-                <h5><i class="bi bi-person-badge"></i> Información Personal</h5>
+                <h5><i class="bi bi-people"></i> Información de Participantes</h5>
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label class="form-label">Buscar Médico</label>
+                        <input type="text" class="form-control" oninput="filtrarSelect(this, 'id_medico')" placeholder="Ej: Juan o 0102030405">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.medico.id_for_label }}">{{ form.medico.label }}</label>
+                        {{ form.medico }}
+                        {% if form.medico.help_text %}<small>{{ form.medico.help_text }}</small>{% endif %}
+                        {% for error in form.medico.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Buscar Paciente</label>
+                        <input type="text" class="form-control" oninput="filtrarSelect(this, 'id_paciente')" placeholder="Ej: María o 1723456789">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.paciente.id_for_label }}">{{ form.paciente.label }}</label>
+                        {{ form.paciente }}
+                        {% if form.paciente.help_text %}<small>{{ form.paciente.help_text }}</small>{% endif %}
+                        {% for error in form.paciente.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Buscar Empleado</label>
+                        <input type="text" class="form-control" oninput="filtrarSelect(this, 'id_empleado')" placeholder="Ej: Pedro o 0911122233">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="{{ form.empleado.id_for_label }}">{{ form.empleado.label }}</label>
+                        {{ form.empleado }}
+                        {% if form.empleado.help_text %}<small>{{ form.empleado.help_text }}</small>{% endif %}
+                        {% for error in form.empleado.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- Información de Ubicación -->
+            <div class="form-section">
+                <h5><i class="bi bi-geo-alt"></i> Información de Ubicación</h5>
                 <div class="form-grid">
                     {% for field in form %}
-                        {% if field.name == 'nombre' or field.name == 'apellido' or field.name == 'cedula' or field.name == 'genero' %}
+                        {% if field.name == 'consultorio' %}
                             <div class="form-group">
                                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                                 {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
+                                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                                {% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
                             </div>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
             
+            <!-- Información de Programación -->
             <div class="form-section">
-                <h5><i class="bi bi-telephone"></i> Información de Contacto</h5>
+                <h5><i class="bi bi-calendar-check"></i> Información de Programación</h5>
                 <div class="form-grid">
                     {% for field in form %}
-                        {% if field.name == 'telefono' or field.name == 'email' %}
+                        {% if field.name == 'fecha' or field.name == 'hora' or field.name == 'estado' %}
                             <div class="form-group">
                                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                                 {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% for field in form %}
-                        {% if field.name == 'direccion' %}
-                            <div class="form-group full-width">
-                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
+                                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                                {% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
                             </div>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
             
+            <!-- Información Financiera -->
             <div class="form-section">
-                <h5><i class="bi bi-briefcase"></i> Información Laboral</h5>
+                <h5><i class="bi bi-currency-dollar"></i> Información Financiera</h5>
                 <div class="form-grid">
                     {% for field in form %}
-                        {% if field.name == 'rol' %}
+                        {% if field.name == 'tarifa' %}
                             <div class="form-group">
                                 <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                                 {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
+                                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                                {% for error in field.errors %}<div class="errorlist">{{ error }}</div>{% endfor %}
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -293,12 +309,34 @@
             </div>
             
             <button type="submit" class="btn-primary">
-                <i class="bi bi-save"></i> Guardar Empleado
+                <i class="bi bi-save"></i> Guardar Cambios
             </button>
         </form>
-        <a href="{% url 'my_app:list-empleados' %}" class="back-link">
+        <a href="{% url 'my_app:list-cita' %}" class="back-link">
             <i class="bi bi-arrow-left"></i> Volver al menú
         </a>
     </div>
 </body>
 </html>
+
+<!-- JavaScript para búsqueda -->
+<script>
+  function filtrarSelect(input, selectId) {
+    const filtro = input.value.toLowerCase();
+    const select = document.getElementById(selectId);
+    if (!select) return;
+
+    for (let i = 0; i < select.options.length; i++) {
+      const texto = select.options[i].text.toLowerCase();
+      select.options[i].style.display = texto.includes(filtro) ? 'block' : 'none';
+    }
+
+    // Selecciona automáticamente la primera opción visible
+    for (let i = 0; i < select.options.length; i++) {
+      if (select.options[i].style.display === 'block') {
+        select.selectedIndex = i;
+        break;
+      }
+    }
+  }
+</script>

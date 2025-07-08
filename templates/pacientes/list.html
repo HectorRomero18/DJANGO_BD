@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Pacientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* Reset básico */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            color: #2c3e50;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-card {
+            background: #ffffffee;
+            border-radius: 20px;
+            padding: 40px 50px;
+            box-shadow: 0 15px 40px rgba(44,62,80,0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            margin-bottom: 30px;
+        }
+        
+        .header-card i.bi-people {
+            font-size: 50px;
+            color: #e74c3c;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        
+        .header-card h1 {
+            text-align: center;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+        
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px 18px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: 3px solid #bdc3c7;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            color: #2c3e50;
+            min-height: 50px;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #e74c3c;
+            box-shadow: 0 0 12px rgba(231,76,60,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .btn-create {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(39,174,96,0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        
+        .btn-create:hover {
+            background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(39,174,96,0.5);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .pacientes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .paciente-card {
+            background: #ffffffee;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(44,62,80,0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            border-left: 5px solid #e74c3c;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .paciente-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #e74c3c20, #c0392b20);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+            transition: all 0.3s ease;
+        }
+        
+        .paciente-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(44,62,80,0.18);
+        }
+        
+        .paciente-card:hover::before {
+            transform: translate(20px, -20px) scale(1.1);
+        }
+        
+        .paciente-card.masculino {
+            border-left-color: #3498db;
+        }
+        
+        .paciente-card.femenino {
+            border-left-color: #e91e63;
+        }
+        
+        .paciente-card.otro {
+            border-left-color: #9c27b0;
+        }
+        
+        .paciente-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .paciente-nombre {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .paciente-genero {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .genero-masculino {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .genero-femenino {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+        
+        .genero-otro {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .paciente-info {
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .paciente-info strong {
+            color: #34495e;
+            font-weight: 700;
+        }
+        
+        .paciente-info span {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .paciente-edad {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #e74c3c;
+            margin-top: 15px;
+            padding: 12px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .paciente-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-action {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+            color: white;
+        }
+        
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #d68910 0%, #b7950b 100%);
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .no-pacientes {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            background: #ffffffee;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(44,62,80,0.12);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        
+        .no-pacientes i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            color: #bdc3c7;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        
+        .pagination-info {
+            background: #ffffffee;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: #2c3e50;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(44,62,80,0.1);
+        }
+        
+        .pagination-link {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-link:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .pagination-link.disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .pagination-link.disabled:hover {
+            background: #bdc3c7;
+            transform: none;
+        }
+        
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .back-link:hover {
+            color: #2980b9;
+            background: rgba(52,152,219,0.1);
+            text-decoration: underline;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-card {
+                padding: 30px 20px;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn-create {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .pacientes-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .paciente-card {
+                padding: 20px;
+            }
+            
+            .paciente-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .paciente-actions {
+                flex-direction: column;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-card">
+            <i class="bi bi-people"></i>
+            <h1>Lista de Pacientes</h1>
+            
+            <form method="get" class="search-bar">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ request.GET.q }}" 
+                    placeholder="Buscar por nombre, apellido o cédula..." 
+                    class="search-input"
+                >
+                <a href="{% url 'my_app:crear-paciente' %}" class="btn-create">
+                    <i class="bi bi-person-plus"></i>
+                    Nuevo Paciente
+                </a>
+            </form>
+        </div>
+        
+        {% if pacientes %}
+            <div class="pacientes-grid">
+                {% for paciente in pacientes %}
+                    <div class="paciente-card {{ paciente.genero|lower }}">
+                        <div class="paciente-header">
+                            <div>
+                                <div class="paciente-nombre">
+                                    <i class="bi bi-person"></i>
+                                    {{ paciente.nombre }} {{ paciente.apellido }}
+                                </div>
+                            </div>
+                            <span class="paciente-genero genero-{{ paciente.genero|lower }}">
+                                {% if paciente.genero == 'M' %}
+                                    <i class="bi bi-gender-male"></i> Masculino
+                                {% elif paciente.genero == 'F' %}
+                                    <i class="bi bi-gender-female"></i> Femenino
+                                {% else %}
+                                    <i class="bi bi-gender-ambiguous"></i> Otro
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <div class="paciente-info">
+                            <strong><i class="bi bi-card-text"></i> Cédula:</strong>
+                            <span>{{ paciente.cedula }}</span>
+                        </div>
+                        
+                        <div class="paciente-info">
+                            <strong><i class="bi bi-calendar-event"></i> Fecha de Nacimiento:</strong>
+                            <span>{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</span>
+                        </div>
+                        
+                        <div class="paciente-info">
+                            <strong><i class="bi bi-telephone"></i> Teléfono:</strong>
+                            <span>{{ paciente.telefono|default:"No especificado" }}</span>
+                        </div>
+                        
+                        <div class="paciente-info">
+                            <strong><i class="bi bi-geo-alt"></i> Dirección:</strong>
+                            <span>{{ paciente.direccion|default:"No especificada" }}</span>
+                        </div>
+                        
+                        <div class="paciente-edad">
+                            <i class="bi bi-hourglass-split"></i>
+                            {% if paciente.edad %}
+                                {{ paciente.edad }} años
+                            {% else %}
+                                Edad no calculada
+                            {% endif %}
+                        </div>
+                        
+                        <div class="paciente-actions">
+                            <a href="{% url 'my_app:paciente-update' paciente.id %}" class="btn-action btn-edit">
+                                <i class="bi bi-pencil"></i>
+                                Editar
+                            </a>
+                            <a href="{% url 'my_app:paciente-delete' paciente.id %}" class="btn-action btn-delete" onclick="return confirm('¿Está seguro de que desea eliminar este paciente?')">
+                                <i class="bi bi-trash"></i>
+                                Eliminar
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            <i class="bi bi-chevron-double-left"></i> Primera
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    {% endif %}
+                    
+                    <div class="pagination-info">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </div>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            Última <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-pacientes">
+                <i class="bi bi-person-x"></i>
+                <p>No se encontraron pacientes</p>
+                {% if request.GET.q %}
+                    <p>Intenta con otro término de búsqueda</p>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        <a href="/" class="back-link">
+            <i class="bi bi-arrow-left"></i> Volver al menú
+        </a>
+    </div>
+
+    <script>
+        // Auto-submit search on input change
+        const searchInput = document.querySelector('.search-input');
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                this.form.submit();
+            }, 500);
+        });
+    </script>
+</body>
+</html>

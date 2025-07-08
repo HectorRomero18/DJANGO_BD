@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Citas Médicas</title>
+    <title>Lista de Consultorios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         /* Reset básico */
@@ -33,9 +33,9 @@
             margin-bottom: 30px;
         }
         
-        .header-card i.bi-calendar-heart {
+        .header-card i.bi-hospital {
             font-size: 50px;
-            color: #3498db;
+            color: #2ecc71;
             display: block;
             margin: 0 auto 20px;
         }
@@ -70,8 +70,8 @@
         
         .search-input:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 12px rgba(52,152,219,0.4);
+            border-color: #2ecc71;
+            box-shadow: 0 0 12px rgba(46,204,113,0.4);
             transform: translateY(-2px);
         }
         
@@ -101,14 +101,14 @@
             text-decoration: none;
         }
         
-        .citas-grid {
+        .consultorios-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
         
-        .cita-card {
+        .consultorio-card {
             background: #ffffffee;
             border-radius: 15px;
             padding: 25px;
@@ -116,140 +116,135 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             transition: all 0.3s ease;
-            border-left: 5px solid #3498db;
+            border-left: 5px solid #2ecc71;
+            position: relative;
+            overflow: hidden;
         }
         
-        .cita-card:hover {
+        .consultorio-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2ecc7120, #27ae6020);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+            transition: all 0.3s ease;
+        }
+        
+        .consultorio-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(44,62,80,0.18);
         }
         
-        .cita-card.pendiente {
-            border-left-color: #f39c12;
+        .consultorio-card:hover::before {
+            transform: translate(20px, -20px) scale(1.1);
         }
         
-        .cita-card.atendida {
-            border-left-color: #27ae60;
-        }
-        
-        .cita-card.cancelada {
-            border-left-color: #e74c3c;
-        }
-        
-        .cita-header {
+        .consultorio-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }
         
-        .cita-fecha {
-            font-size: 1.2rem;
+        .consultorio-nombre {
+            font-size: 1.4rem;
             font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 5px;
+            line-height: 1.3;
         }
         
-        .cita-estado {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
+        .consultorio-icon {
+            font-size: 2.5rem;
+            color: #2ecc71;
+            opacity: 0.8;
         }
         
-        .estado-pendiente {
-            background: #ffeaa7;
-            color: #d68910;
+        .consultorio-info {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
         }
         
-        .estado-atendida {
-            background: #a8e6cf;
-            color: #229954;
-        }
-        
-        .estado-cancelada {
-            background: #ffcccb;
-            color: #c0392b;
-        }
-        
-        .cita-info {
-            margin-bottom: 12px;
-        }
-        
-        .cita-info strong {
+        .consultorio-info strong {
             color: #34495e;
             font-weight: 700;
         }
         
-        .cita-info span {
+        .consultorio-info span {
             color: #2c3e50;
             font-weight: 500;
         }
         
-        .cita-tarifa {
-            text-align: right;
-            font-size: 1.3rem;
+        .consultorio-ciudad {
+            text-align: center;
+            font-size: 1.1rem;
             font-weight: 800;
-            color: #27ae60;
+            color: #2ecc71;
             margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #ecf0f1;
+            padding: 12px;
+            background: linear-gradient(135deg, #d5f4e6 0%, #a8e6cf 100%);
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
         }
         
-        /* Estilos para los botones de acción */
-        .cita-actions {
+        .consultorio-actions {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid #ecf0f1;
+            margin-top: 15px;
+            position: relative;
+            z-index: 1;
         }
         
         .btn-action {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 10px 16px;
+            flex: 1;
+            padding: 8px 12px;
             border: none;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 0.95rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            flex: 1;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
+            gap: 5px;
         }
         
-        .btn-editar {
-            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        .btn-edit {
+            background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(52,152,219,0.3);
         }
         
-        .btn-editar:hover {
-            background: linear-gradient(135deg, #2980b9 0%, #1f618d 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52,152,219,0.4);
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #d68910 0%, #b7950b 100%);
+            transform: translateY(-1px);
             color: white;
             text-decoration: none;
         }
         
-        .btn-eliminar {
+        .btn-delete {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
-            box-shadow: 0 4px 15px rgba(231,76,60,0.3);
         }
         
-        .btn-eliminar:hover {
+        .btn-delete:hover {
             background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(231,76,60,0.4);
+            transform: translateY(-1px);
             color: white;
             text-decoration: none;
         }
         
-        .no-citas {
+        .no-consultorios {
             text-align: center;
             padding: 60px 20px;
             color: #7f8c8d;
@@ -261,11 +256,56 @@
             -webkit-backdrop-filter: blur(8px);
         }
         
-        .no-citas i {
+        .no-consultorios i {
             font-size: 4rem;
             margin-bottom: 20px;
             display: block;
             color: #bdc3c7;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        
+        .pagination-info {
+            background: #ffffffee;
+            padding: 15px 20px;
+            border-radius: 10px;
+            color: #2c3e50;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(44,62,80,0.1);
+        }
+        
+        .pagination-link {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-link:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .pagination-link.disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .pagination-link.disabled:hover {
+            background: #bdc3c7;
+            transform: none;
         }
         
         .back-link {
@@ -303,28 +343,28 @@
                 justify-content: center;
             }
             
-            .citas-grid {
+            .consultorios-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
             
-            .cita-card {
+            .consultorio-card {
                 padding: 20px;
             }
             
-            .cita-header {
+            .consultorio-header {
                 flex-direction: column;
                 gap: 10px;
                 align-items: flex-start;
             }
             
-            .cita-actions {
+            .consultorio-actions {
                 flex-direction: column;
-                gap: 12px;
             }
             
-            .btn-action {
-                width: 100%;
+            .pagination {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -332,75 +372,54 @@
 <body>
     <div class="container">
         <div class="header-card">
-            <i class="bi bi-calendar-heart"></i>
-            <h1>Citas Médicas</h1>
+            <i class="bi bi-hospital"></i>
+            <h1>Lista de Consultorios</h1>
             
             <form method="get" class="search-bar">
                 <input 
                     type="text" 
                     name="q" 
                     value="{{ request.GET.q }}" 
-                    placeholder="Buscar por paciente, médico o empleado..." 
+                    placeholder="Buscar por descripción o ciudad..." 
                     class="search-input"
                 >
-                <a href="{{ create_url }}" class="btn-create">
-                    <i class="bi bi-calendar-plus"></i>
-                    Nueva Cita
+                <a href="{% url 'my_app:crear-consultorio' %}" class="btn-create">
+                    <i class="bi bi-plus-circle"></i>
+                    Nuevo Consultorio
                 </a>
             </form>
         </div>
         
-        {% if citas_medicas %}
-            <div class="citas-grid">
-                {% for cita in citas_medicas %}
-                    <div class="cita-card {{ cita.estado }}">
-                        <div class="cita-header">
-                            <div class="cita-fecha">
-                                <i class="bi bi-calendar-event"></i>
-                                {{ cita.fecha|date:"d/m/Y" }} - {{ cita.hora|time:"H:i" }}
+        {% if consultorios %}
+            <div class="consultorios-grid">
+                {% for consultorio in consultorios %}
+                    <div class="consultorio-card">
+                        <div class="consultorio-header">
+                            <div>
+                                <div class="consultorio-nombre">
+                                    <i class="bi bi-geo-alt"></i>
+                                    {{ consultorio.ubicacion.descripcion }}
+                                </div>
                             </div>
-                            <span class="cita-estado estado-{{ cita.estado }}">
-                                {{ cita.get_estado_display }}
-                            </span>
+                            <i class="bi bi-hospital consultorio-icon"></i>
                         </div>
                         
-                        <div class="cita-info">
-                            <strong><i class="bi bi-person-heart"></i> Paciente:</strong>
-                            <span>{{ cita.paciente.nombre }} {{ cita.paciente.apellido }}</span>
+                        <div class="consultorio-info">
+                            <strong><i class="bi bi-building"></i> Ciudad:</strong>
+                            <span>{{ consultorio.ubicacion.ciudad.nombre }}</span>
                         </div>
                         
-                        <div class="cita-info">
-                            <strong><i class="bi bi-person-badge"></i> Médico:</strong>
-                            <span>{{ cita.medico.nombre }} {{ cita.medico.apellido }}</span>
+                        <div class="consultorio-ciudad">
+                            <i class="bi bi-geo-alt-fill"></i>
+                            Consultorio {{ consultorio.numero }}
                         </div>
                         
-                        <div class="cita-info">
-                            <strong><i class="bi bi-hospital"></i> Especialidad:</strong>
-                            <span>{{ cita.medico.especialidad }}</span>
-                        </div>
-                        
-                        <div class="cita-info">
-                            <strong><i class="bi bi-person-workspace"></i> Empleado:</strong>
-                            <span>{{ cita.empleado.nombre }} {{ cita.empleado.apellido }}</span>
-                        </div>
-                        
-                        <div class="cita-info">
-                            <strong><i class="bi bi-door-open"></i> Consultorio:</strong>
-                            <span>{{ cita.consultorio.numero }}</span>
-                        </div>
-                        
-                        <div class="cita-tarifa">
-                            <i class="bi bi-currency-dollar"></i>
-                            ${{ cita.tarifa|floatformat:2 }}
-                        </div>
-                        
-                        <!-- Botones de acción -->
-                        <div class="cita-actions">
-                            <a href="{% url 'my_app:cita-update' cita.id %}" class="btn-action btn-editar">
-                                <i class="bi bi-pencil-square"></i>
+                        <div class="consultorio-actions">
+                            <a href="{% url 'my_app:consultorio-update' consultorio.id %}" class="btn-action btn-edit">
+                                <i class="bi bi-pencil"></i>
                                 Editar
                             </a>
-                            <a href="{% url 'my_app:cita-delete' cita.id %}" class="btn-action btn-eliminar">
+                            <a href="{% url 'my_app:consultorio-delete' consultorio.id %}" class="btn-action btn-delete" onclick="return confirm('¿Está seguro de que desea eliminar este consultorio?')">
                                 <i class="bi bi-trash"></i>
                                 Eliminar
                             </a>
@@ -408,10 +427,37 @@
                     </div>
                 {% endfor %}
             </div>
+            
+            <!-- Paginación -->
+            {% if is_paginated %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            <i class="bi bi-chevron-double-left"></i> Primera
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    {% endif %}
+                    
+                    <div class="pagination-info">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </div>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" class="pagination-link">
+                            Última <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% else %}
-            <div class="no-citas">
-                <i class="bi bi-calendar-x"></i>
-                <p>No se encontraron citas médicas</p>
+            <div class="no-consultorios">
+                <i class="bi bi-hospital"></i>
+                <p>No se encontraron consultorios</p>
                 {% if request.GET.q %}
                     <p>Intenta con otro término de búsqueda</p>
                 {% endif %}

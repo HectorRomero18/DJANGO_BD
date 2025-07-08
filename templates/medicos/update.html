@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{% if medico %}Editar Médico{% else %}Crear Médico{% endif %}</title>
+    <title>Editar Médico</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         /* Reset básico */
@@ -30,7 +30,7 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
         }
-        .center-card i.bi-person-plus, .center-card i.bi-person-gear {
+        .center-card i.bi-person-gear {
             font-size: 50px;
             color: #3498db;
             display: block;
@@ -450,17 +450,12 @@
 </head>
 <body>
     <div class="center-card">
-        {% if medico %}
-            <i class="bi bi-person-gear"></i>
-            <h2>Editar Médico</h2>
-            <div class="edit-indicator">
-                <i class="bi bi-pencil-square"></i>
-                Editando información del Dr. {{ medico.nombre }} {{ medico.apellido }}
-            </div>
-        {% else %}
-            <i class="bi bi-person-plus"></i>
-            <h2>Registrar Médico</h2>
-        {% endif %}
+        <i class="bi bi-person-gear"></i>
+        <h2>Editar Médico</h2>
+        <div class="edit-indicator">
+            <i class="bi bi-pencil-square"></i>
+            Editando información del Dr. {{ medico.nombre }} {{ medico.apellido }}
+        </div>
         
         <form method="post">
             {% csrf_token %}
@@ -469,20 +464,26 @@
             <div class="form-section">
                 <h5><i class="bi bi-person-badge"></i> Información Personal</h5>
                 <div class="form-grid">
-                    {% for field in form %}
-                        {% if field.name == 'nombre' or field.name == 'apellido' or field.name == 'cedula' or field.name == 'genero' %}
-                            <div class="form-group">
-                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                    <div class="form-group">
+                        <label class="form-label" for="id_nombre">Nombre</label>
+                        <input type="text" name="nombre" id="id_nombre" value="{{ medico.nombre }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_apellido">Apellido</label>
+                        <input type="text" name="apellido" id="id_apellido" value="{{ medico.apellido }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_cedula">Cédula</label>
+                        <input type="text" name="cedula" id="id_cedula" value="{{ medico.cedula }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="id_genero">Género</label>
+                        <select name="genero" id="id_genero" required>
+                            <option value="">Seleccione género</option>
+                            <option value="M" {% if medico.genero == 'M' %}selected{% endif %}>Masculino</option>
+                            <option value="F" {% if medico.genero == 'F' %}selected{% endif %}>Femenino</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             
@@ -490,35 +491,14 @@
             <div class="form-section">
                 <h5><i class="bi bi-telephone"></i> Información de Contacto</h5>
                 <div class="form-grid">
-                    {% for field in form %}
-                        {% if field.name == 'telefono' %}
-                            <div class="form-group">
-                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    
-                    {% for field in form %}
-                        {% if field.name == 'direccion' %}
-                            <div class="form-group full-width">
-                                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                {{ field }}
-                                {% if field.help_text %}
-                                    <small>{{ field.help_text }}</small>
-                                {% endif %}
-                                {% for error in field.errors %}
-                                    <div class="errorlist">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+                    <div class="form-group">
+                        <label class="form-label" for="id_telefono">Teléfono</label>
+                        <input type="text" name="telefono" id="id_telefono" value="{{ medico.telefono }}" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label" for="id_direccion">Dirección</label>
+                        <textarea name="direccion" id="id_direccion" rows="3">{{ medico.direccion }}</textarea>
+                    </div>
                 </div>
             </div>
             
@@ -543,7 +523,7 @@
                 </div>
             </div>
             
-            <!-- Sección de Horarios Mejorada -->
+            <!-- Sección de Horarios -->
             <div class="horarios-section">
                 <h5><i class="bi bi-clock"></i> Horarios de Atención</h5>
                 <div class="horarios-container">
@@ -572,21 +552,13 @@
             </div>
             
             <div class="buttons-container">
-                {% if medico %}
-                    <button type="submit" class="btn-primary">
-                        <i class="bi bi-save"></i> Actualizar Médico
-                    </button>
-                    <button type="button" class="btn-secondary" onclick="window.location.href='{% url "my_app:detail-medico" medico.id %}'">
-                        <i class="bi bi-eye"></i> Ver Detalles
-                    </button>
-                    <button type="button" class="btn-danger" onclick="if(confirm('¿Estás seguro de que deseas eliminar este médico?')) { window.location.href='{% url "my_app:delete-medico" medico.id %}'; }">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </button>
-                {% else %}
-                    <button type="submit" class="btn-primary">
-                        <i class="bi bi-save"></i> Guardar Médico
-                    </button>
-                {% endif %}
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-save"></i> Actualizar Médico
+                </button>
+
+                <button type="button" class="btn-danger" onclick="if(confirm('¿Estás seguro de que deseas eliminar este médico?')) { window.location.href='{% url "my_app:medico-delete" medico.id %}'; }">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
             </div>
         </form>
         

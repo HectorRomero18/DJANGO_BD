@@ -2,18 +2,20 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.core.exceptions import ValidationError
-
+from datetime import date
 # Create your models here.
 
 class Menu(models.Model):
     name = models.CharField(verbose_name='Nombre', max_length=150, unique=True)
     icon = models.CharField(verbose_name='Icono', max_length=100, default='bi bi-calendar-x-fill')
     order = models.PositiveSmallIntegerField(verbose_name='Orden', default=0)
-    
+
+   
     def __str__(self):
         return self.name
 
     class Meta:
+        db_table = 'sgm_m_menu'
         verbose_name = 'Menu'
         verbose_name_plural = 'Menus'
         ordering = ['order', 'name']
@@ -32,6 +34,7 @@ class Module(models.Model):
 
     class Meta:
         verbose_name = 'Módulo'
+        db_table = 'sgm_m_module'
         verbose_name_plural = 'Módulos'
         ordering = ['menu', 'order', 'name']
 
@@ -99,6 +102,16 @@ class Paciente(models.Model):
         verbose_name='user permissions',
     )
 
+    @property
+    def edad(self):
+        today = date.today()
+        if self.fecha_nacimiento:
+            edad = today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+        return edad
+
+    class Meta:
+        db_table = 'sgm_m_paciente'
+
     def __str__(self):
         return f"{self.nombre} - {self.cedula}"
 
@@ -110,6 +123,38 @@ class Especialidad(models.Model):
 
     def __str__(self):
         return self.nombre
+
+    class Meta:
+        db_table = 'sgm_p_especialidad'
+
+    
+
+DIAS_SEMANA = [
+    ('Lun', 'Lunes'),
+    ('Mar', 'Martes'),
+    ('Mie', 'Miércoles'),
+    ('Jue', 'Jueves'),
+    ('Vie', 'Viernes'),
+    ('Sab', 'Sábado'),
+    ('Dom', 'Domingo'),
+]
+
+class Horario(models.Model):
+    dia_semana = models.CharField(max_length=3, choices=DIAS_SEMANA)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+
+    def clean(self):
+        super().clean()
+        if self.hora_fin <= self.hora_inicio:
+            raise ValidationError('La hora de fin debe ser mayor que la hora de inicio.')
+
+    def __str__(self):
+        return f"{self.get_dia_semana_display()} ({self.hora_inicio} a {self.hora_fin})"
+
+    class Meta:
+        db_table = 'sgm_p_horario'
+
 
 
 
@@ -123,34 +168,22 @@ class Medico(models.Model):
     direccion = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    horarios = models.ManyToManyField(Horario, related_name='medicos', blank=True)
+
+
+    # @property
+    # def edad(self):
+    #     today = date.today()
+    #     if self.fecha_nacimiento:
+    #         edad = today.year - self.fecha_nacimiento.year - ((today.month, today.day) < (self.fecha_nacimiento.month, self.fecha_nacimiento.day))
+    #     return edad
 
     def __str__(self):
         return f"{self.nombre} - {self.cedula}"
 
+    class Meta:
+        db_table = 'sgm_m_medico'
 
-DIAS_SEMANA = [
-    ('Lun', 'Lunes'),
-    ('Mar', 'Martes'),
-    ('Mie', 'Miércoles'),
-    ('Jue', 'Jueves'),
-    ('Vie', 'Viernes'),
-    ('Sab', 'Sábado'),
-    ('Dom', 'Domingo'),
-]
-
-class Horario(models.Model):
-    medico = models.ForeignKey(Medico, on_delete=models.CASCADE, related_name='horarios')
-    dia_semana = models.CharField(max_length=3, choices=DIAS_SEMANA)
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-
-    def clean(self):
-        super().clean()
-        if self.hora_fin <= self.hora_inicio:
-            raise ValidationError('La hora de fin debe ser mayor que la hora de inicio.')
-
-    def __str__(self):
-        return f"{self.medico.user.get_full_name()} - {self.get_dia_semana_display()} ({self.hora_inicio} a {self.hora_fin})"
 
 
 class Rol(models.Model):
@@ -159,6 +192,9 @@ class Rol(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    class Meta:
+        db_table = 'sgm_p_rol'
 
 class Empleado(models.Model):
     nombre = models.CharField(max_length=100, null=True, blank=True)
@@ -168,6 +204,9 @@ class Empleado(models.Model):
     genero = models.CharField(max_length=1, choices=GENERO_CHOICES)
     direccion = models.CharField(max_length=200)
     rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True, related_name='empleados')
+
+    class Meta:
+        db_table = 'sgm_m_empleado'
 
 
     def __str__(self):
@@ -179,6 +218,9 @@ class Ciudad(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    class Meta:
+        db_table = 'sgm_p_ciudad'
 
 
 class Ubicacion(models.Model):
@@ -189,17 +231,21 @@ class Ubicacion(models.Model):
     def __str__(self):
         return f"{self.descripcion} en {self.ciudad}"
 
+    class Meta:
+        db_table = 'sgm_p_ubicacion'
+
 
 
 class Consultorio(models.Model):
     numero = models.CharField(max_length=10)
     ubicacion = models.ForeignKey(Ubicacion, on_delete=models.CASCADE, related_name='consultorios')
-
     class Meta:
+        db_table = 'sgm_m_consultorio'
         unique_together = ('numero', 'ubicacion')
 
     def __str__(self):
         return f"Consultorio {self.numero} - {self.ubicacion.descripcion} ({self.ubicacion.ciudad.nombre})"
+    
 
 
 class CitaMedica(models.Model):
@@ -218,3 +264,6 @@ class CitaMedica(models.Model):
     fecha = models.DateField()
     hora = models.TimeField()
     tarifa = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        db_table = 'sgm_t_cita_medica'

@@ -4,10 +4,6 @@ from .models import (
     Empleado, Rol, Ciudad, Ubicacion, Consultorio, CitaMedica, Module, Menu
 )
 
-# Inlines
-class HorarioInline(admin.TabularInline):
-    model = Horario
-    extra = 1
 
 # Admins personalizados
 @admin.register(Menu)
@@ -36,23 +32,29 @@ class CitaMedicaAdmin(admin.ModelAdmin):
     ordering = ('-fecha', '-hora')
 
 
+
+@admin.register(Horario)
+class HorarioAdmin(admin.ModelAdmin):
+    list_display = ('dia_semana', 'hora_inicio', 'hora_fin')
+    list_filter = ('dia_semana',)
+
 @admin.register(Medico)
 class MedicoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'apellido', 'cedula', 'especialidad', 'telefono', 'genero', 'direccion', 'created_at')
-    search_fields = ('user__first_name', 'user__last_name', 'cedula', 'especialidad__nombre')
+    search_fields = ('nombre', 'apellido', 'cedula', 'especialidad__nombre')
     list_filter = ('especialidad', 'genero')
-    inlines = [HorarioInline]
+    filter_horizontal = ('horarios',)
 
 @admin.register(Paciente)
 class PacienteAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'apellido', 'cedula', 'telefono', 'genero', 'direccion', 'fecha_nacimiento', 'created_at')
-    search_fields = ('user__first_name', 'user__last_name', 'cedula')
+    search_fields = ('nombre', 'apellido', 'cedula')
     list_filter = ('genero',)
 
 @admin.register(Empleado)
 class EmpleadoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'apellido', 'cedula', 'telefono', 'genero', 'direccion', 'rol')
-    search_fields = ('user__first_name', 'user__last_name', 'cedula', 'rol__nombre')
+    search_fields = ('nombre', 'apellido', 'cedula', 'rol__nombre')
     list_filter = ('rol', 'genero')
 
 @admin.register(Especialidad)
